@@ -1,3 +1,12 @@
+# Text Colors
+RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+BLUE='\e[34m'
+CYAN='\e[36m'
+RESET='\e[0m' # No Color
+
+
 #Phase 2 
 read -p "Country Name (2 letter code) [EG]: " countryName
 countryName=${countryName:-EG}
@@ -42,7 +51,6 @@ openssl genrsa -aes256 -out ${output_dir}/ca-key.pem -passout env:secure_passphr
 echo "CA private key generated successfully."
 echo ""
 echo ""
-
 # Generate CA certificate for CA private key with 10 years validity
 openssl req -x509 -new -key ${output_dir}/ca-key.pem  -sha256 -days 3650 -out ${output_dir}/ca.pem -passin env:secure_passphrase -subj "/C=$countryName/ST=$stateOrProvinceName/L=$localityName/O=$organizationName/OU=$organizationalUnitName/CN=$commonName/emailAddress=$emailAddress"
 echo "CA certificate generated successfully."
