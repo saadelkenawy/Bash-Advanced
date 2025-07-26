@@ -8,7 +8,7 @@ RESET='\e[0m' # No Color
 
 
 #Phase 2 
-read -p "Country Name (2 letter code) [EG]: " countryName
+read -p "$(echo -e ${BLUE} 'Country Name (2 letter code) [EG]: ' ${GREEN})" countryName
 countryName=${countryName:-EG}
 echo ""
 echo ""
