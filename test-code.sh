@@ -28,7 +28,7 @@ read -p "$(echo -e ${BLUE} 'Organizational Unit Name [IT]: ' ${GREEN})" organiza
 organizationalUnitName=${organizationalUnitName:-CA Certificate Authority Unit BY Saad Elkenawy}
 echo ""
 echo ""
-read -p "$(echo -e ${BLUE} 'Common Name (e.g., your server's FQDN) [server.mycompany.com]: ' ${GREEN})" commonName
+read -p "$(echo -e ${BLUE} 'Common Name (e.g., your server's FQDN) [server.mycompany.com]: )"  commonName
 commonName=${commonName:-CA Certificate Authority BY Saad Elkenawy}
 echo ""
 echo ""
@@ -54,5 +54,15 @@ echo ""
 # Generate CA certificate for CA private key with 10 years validity
 openssl req -x509 -new -key ${output_dir}/ca-key.pem  -sha256 -days 3650 -out ${output_dir}/ca.pem -passin env:secure_passphrase -subj "/C=$countryName/ST=$stateOrProvinceName/L=$localityName/O=$organizationName/OU=$organizationalUnitName/CN=$commonName/emailAddress=$emailAddress"
 echo -e "${GREEN}CA certificate generated successfully.${RESET}"
+echo ""
+echo ""
+# Generate a cert Key for your server 
+openssl genrsa -out ${output_dir}/cert-key.pem 4096
+echo -e "${GREEN}Server private key generated successfully.${RESET}"
+echo ""
+echo ""
+# Generate a CSR for your server
+openssl req -new -sha256 "/CN=S.M.S.K"  -key ${output_dir}/cert-key.pem -out ${output_dir}/cert.csr
+echo -e "${GREEN}Certificate Signing Request (CSR) generated successfully.${RESET}"
 echo ""
 echo ""
