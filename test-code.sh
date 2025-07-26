@@ -66,3 +66,38 @@ openssl req -new -sha256 "/CN=S.M.S.K"  -key ${output_dir}/cert-key.pem -out ${o
 echo -e "${GREEN}Certificate Signing Request (CSR) generated successfully.${RESET}"
 echo ""
 echo ""
+
+#How many DNS names you want to add?
+   read -p "How many DNS names do you want to add? " dns_count
+   if ! [[ "$dns_count" =~ ^[0-9]+$ ]] || [ "$dns_count" -le 0 ]; then
+       echo "Invalid input. Please enter a positive integer."
+       exit 1
+   fi
+
+   for ((i=1; i<=dns_count; i++)); do
+       read -p "Enter DNS name $i: " dns_name
+       echo "DNS: $dns_name ," >> openssl.cnf
+       count_i = $i
+   done
+#How many IP-Addrss you want to add?
+   read -p "How many IP-Addrss do you want to add? " ip_count
+   if ! [[ "$ip_count" =~ ^[0-9]+$ ]] || [ "$ip_count" -le 0 ]; then
+       echo "Invalid input. Please enter a positive integer."
+       exit 1
+   fi
+
+   for ((y=1; y<=ip_count; y++)); do
+       read -p "Enter Ip-Address $y: " ip_address
+       echo "DNS: $ip_address ," >> openssl.cnf
+       count_y = $iy
+   done
+#cat <<EOL > ${output_dir}/v3.ext
+cat <<EOL > v3.ext
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement, keyCertSign
+subjectAltName = 
+EOL
+# Apply Clean On v3.ext file
+sed -i '$s/[.,]$//' v3.ext
+echo -e "${GREEN}v3.ext file created successfully.${RESET}"
+echo ""
+echo "Alternative Names created successfully."
