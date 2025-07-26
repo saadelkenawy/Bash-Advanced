@@ -90,7 +90,7 @@ EOL
 # Creare the v3.ext file in the same directory
 cat <<EOL > ~/openssl_config/v3.ext
 keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement, keyCertSign
-subjectAltName = DNS:mgn.lc,  DNS:www.mgn.lc,  DNS:www.cockpit.mgm.lc,  DNS:cockpit.mgm.lc
+subjectAltName = DNS:mgn.lc, DNS:www.mgn.lc, DNS:www.cockpit.mgm.lc, DNS:cockpit.mgm.lc
 EOL
 
 echo "openssl.cnf file created successfully."
