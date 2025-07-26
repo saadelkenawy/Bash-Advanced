@@ -28,26 +28,7 @@ if [[ "$response" == "yes" ]]; then
 # each value in openssl.cnf is defualt value need to ask user for input to change it 
 # create a file openssl.cnf 
 # Task 2: Get user input for certificate details with default values.
-read -p "Country Name (2 letter code) [EG]: " countryName
-countryName=${countryName:-EG}
 
-read -p "State or Province Name [Cairo]: " stateOrProvinceName
-stateOrProvinceName=${stateOrProvinceName:-Cairo}
-
-read -p "Locality Name [Giza]: " localityName
-localityName=${localityName:-Giza}
-
-read -p "Organization Name [My Company]: " organizationName
-organizationName=${organizationName:- IT-Solutions}
-
-read -p "Organizational Unit Name [IT]: " organizationalUnitName
-organizationalUnitName=${organizationalUnitName:-IT-Department}
-
-read -p "Common Name (e.g., your server's FQDN) [server.mycompany.com]: " commonName
-commonName=${commonName:-www.mgm.lc}
-
-read -p "Email Address [admin@mycompany.com]: " emailAddress
-emailAddress=${emailAddress:-saad_elkenawy@yahoo.com}
 
 
 # How many DNS names you want to add?
@@ -62,30 +43,30 @@ emailAddress=${emailAddress:-saad_elkenawy@yahoo.com}
        echo "DNS.$i = $dns_name" >> openssl.cnf
    done
 
-echo "Creating openssl.cnf file..."
-# create a directory to store the openssl.cnf file
-mkdir -p ~/openssl_config
-cat <<EOL > ~/openssl_config/openssl.cnf
-[req]
-prompt = no
-distinguished_name = req_distinguished_name
-req_extensions = v3_req
+# echo "Creating openssl.cnf file..."
+# # create a directory to store the openssl.cnf file
+# mkdir -p ~/openssl_config
+# cat <<EOL > ~/openssl_config/openssl.cnf
+# [req]
+# prompt = no
+# distinguished_name = req_distinguished_name
+# req_extensions = v3_req
 
-[req_distinguished_name]
-countryName = $countryName
-stateOrProvinceName = $stateOrProvinceName
-localityName = $localityName
-organizationName = $organizationName
-organizationalUnitName = $organizationalUnitName
-commonName = $commonName
-emailAddress = $emailAddress
+# [req_distinguished_name]
+# countryName = $countryName
+# stateOrProvinceName = $stateOrProvinceName
+# localityName = $localityName
+# organizationName = $organizationName
+# organizationalUnitName = $organizationalUnitName
+# commonName = $commonName
+# emailAddress = $emailAddress
 
-[v3_req]
-subjectAltName = @alt_names
+# [v3_req]
+# subjectAltName = @alt_names
 
-[alt_names]
-DNS.1 = $dns_name
-EOL
+# [alt_names]
+# DNS.1 = $dns_name
+# EOL
 
 # Creare the v3.ext file in the same directory
 cat <<EOL > ~/openssl_config/v3.ext
@@ -106,11 +87,38 @@ EOL
 # openssl x509 -req -in csr.pem -signkey private.key -out certificate.crt -days 3650 -sha256 -extfile v3.ext
 
 #Phase 2 
-mkdir -p ~/openssl_output
+read -p "Country Name (2 letter code) [EG]: " countryName
+countryName=${countryName:-EG}
+
+read -p "State or Province Name [Cairo]: " stateOrProvinceName
+stateOrProvinceName=${stateOrProvinceName:-Cairo}
+
+read -p "Locality Name [Giza]: " localityName
+localityName=${localityName:-Giza}
+
+read -p "Organization Name [My Company]: " organizationName
+organizationName=${organizationName:- CA Certificate Authority Organization BY Saad Elkenawy }
+
+read -p "Organizational Unit Name [IT]: " organizationalUnitName
+organizationalUnitName=${organizationalUnitName:-CA Certificate Authority Unit BY Saad Elkenawy}
+
+read -p "Common Name (e.g., your server's FQDN) [server.mycompany.com]: " commonName
+commonName=${commonName:-CA Certificate Authority BY Saad Elkenawy}
+
+read -p "Email Address [admin@mycompany.com]: " emailAddress
+emailAddress=${emailAddress:-saad_elkenawy@yahoo.com}
+# create a directory to store the openssl output files
+echo "Creating output directory for OpenSSL files..."
+output_dir=~/openssl_output
+mkdir -p ${output_dir}
 #Generate CA with PassPharse
 # read from user a secure passphrase and save it in a variable name secure_passphrase
 read -sp "Enter a secure passphrase for the CA private key: " secure_passphrase
 # export the variable  
 export secure_passphrase
-openssl genrsa -aes256 -out ca.key -passout env:secure_passphrase 4096
+openssl genrsa -aes256 -out ca-key.pem -passout env:secure_passphrase 4096
 echo "CA private key generated successfully."
+
+# Generate CA certificate for CA private key with 10 years validity
+openssl req -x509 -new -key ${output_dir}/ca-key.pem  -sha256 -days 3650 -out ${output_dir}/ca.pem -passin env:secure_passphrase -subj "/C=$countryName/ST=$stateOrProvinceName/L=$localityName/O=$organizationName/OU=$organizationalUnitName/CN=$commonName/emailAddress=$emailAddress"
+echo "CA certificate generated successfully."
