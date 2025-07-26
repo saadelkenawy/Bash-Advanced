@@ -95,16 +95,6 @@ EOL
 # openssl x509 -req -in csr.pem -signkey private.key -out certificate.crt -days 3650 -sha256 -extfile v3.ext
 
 #Phase 2 
-# Text Colors
-RED='\e[31m'
-GREEN='\e[32m'
-YELLOW='\e[33m'
-BLUE='\e[34m'
-CYAN='\e[36m'
-RESET='\e[0m' # No Color
-
-
-#Phase 2 
 read -p "$(echo -e ${BLUE} 'Country Name (2 letter code) [EG]: ' ${GREEN})" countryName
 countryName=${countryName:-EG}
 echo ""
