@@ -1,5 +1,13 @@
 #This script to automate the generation of a self-signed SSL certificate using OpenSSL
 #!/bin/bash
+#Definitions of text colors for better readability
+RED='\e[31m'
+GREEN='\e[32m'
+YELLOW='\e[33m'
+BLUE='\e[34m'
+CYAN='\e[36m'
+RESET='\e[0m' # No Color
+
 #Task1: make sure openssl is installed
 if ! command -v openssl &> /dev/null; then
     echo "OpenSSL is not installed. Please install it to proceed."
