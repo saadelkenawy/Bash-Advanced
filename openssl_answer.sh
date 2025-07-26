@@ -62,8 +62,10 @@ emailAddress=${emailAddress:-saad_elkenawy@yahoo.com}
        echo "DNS.$i = $dns_name" >> openssl.cnf
    done
 
-   echo "Creating openssl.cnf file..."
-   cat <<EOL > openssl.cnf
+echo "Creating openssl.cnf file..."
+# create a directory to store the openssl.cnf file
+mkdir -p ~/openssl_config
+cat <<EOL > ~/openssl_config/openssl.cnf
 [req]
 prompt = no
 distinguished_name = req_distinguished_name
@@ -83,6 +85,12 @@ subjectAltName = @alt_names
 
 [alt_names]
 DNS.1 = $dns_name
+EOL
+
+# Creare the v3.ext file in the same directory
+cat <<EOL > ~/openssl_config/v3.ext
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement, keyCertSign
+subjectAltName = DNS:mgn.lc,  DNS:www.mgn.lc,  DNS:www.cockpit.mgm.lc,  DNS:cockpit.mgm.lc
 EOL
 
 echo "openssl.cnf file created successfully."
