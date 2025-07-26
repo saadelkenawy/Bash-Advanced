@@ -101,3 +101,6 @@ echo "Private key generated successfully."
 # gernerate CSR
 openssl req -new -key private.key -out csr.pem -config openssl.cnf
 echo "Certificate Signing Request (CSR) generated successfully."
+
+#generate self-signed certificate
+openssl x509 -req -in csr.pem -signkey private.key -out certificate.crt -days 3650 -sha256 -extfile v3.ext
