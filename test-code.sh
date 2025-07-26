@@ -28,7 +28,7 @@ mkdir -p ${output_dir}
 read -sp "Enter a secure passphrase for the CA private key: " secure_passphrase
 # export the variable  
 export secure_passphrase
-openssl genrsa -aes256 -out ca-key.pem -passout env:secure_passphrase 4096
+openssl genrsa -aes256 -out ${output_dir}/ca-key.pem -passout env:secure_passphrase 4096
 echo "CA private key generated successfully."
 
 # Generate CA certificate for CA private key with 10 years validity
