@@ -93,14 +93,24 @@ keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, 
 subjectAltName = DNS:mgn.lc, DNS:www.mgn.lc, DNS:www.cockpit.mgm.lc, DNS:cockpit.mgm.lc
 EOL
 
-echo "openssl.cnf file created successfully."
-# generate private key
-openssl genpkey  -out private.key -algorithm RSA 
-echo "Private key generated successfully."
+# echo "openssl.cnf file created successfully."
+# # generate private key
+# openssl genpkey  -out private.key -algorithm RSA 
+# echo "Private key generated successfully."
 
-# gernerate CSR
-openssl req -new -key private.key -out csr.pem -config openssl.cnf
-echo "Certificate Signing Request (CSR) generated successfully."
+# # gernerate CSR
+# openssl req -new -key private.key -out csr.pem -config openssl.cnf
+# echo "Certificate Signing Request (CSR) generated successfully."
 
-#generate self-signed certificate
-openssl x509 -req -in csr.pem -signkey private.key -out certificate.crt -days 3650 -sha256 -extfile v3.ext
+# #generate self-signed certificate
+# openssl x509 -req -in csr.pem -signkey private.key -out certificate.crt -days 3650 -sha256 -extfile v3.ext
+
+#Phase 2 
+mkdir -p ~/openssl_output
+#Generate CA with PassPharse
+# read from user a secure passphrase and save it in a variable name secure_passphrase
+read -sp "Enter a secure passphrase for the CA private key: " secure_passphrase
+# export the variable  
+export secure_passphrase
+openssl genrsa -aes256 -out ca.key -passout env:secure_passphrase 4096
+echo "CA private key generated successfully."
