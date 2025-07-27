@@ -1,31 +1,6 @@
 #! /bin/bash
 #Task1: make sure openssl is installed
 #===============================================
-# if ! command -v openssl &> /dev/null; then
-#     echo "OpenSSL is not installed. Please install it to proceed."
-# fi 
-# # ask user to download openssl
-# echo "kindly confirm with yes to download openssl"
-# read -p "Do you want to download OpenSSL? (yes/no): " response
-# if [[ "$response" == "yes" ]]; then
-#     echo "Downloading OpenSSL..."
-#     # check if the system is Centos or Rocky Linux or Redhat by grep the /etc/os-release file and show name
-#    if grep -q -i "centos" /etc/os-release; then
-#        echo "Detected CentOS."
-#         sudo yum install openssl -y
-#    elif grep -q -i "rocky" /etc/os-release; then
-#        echo "Detected Rocky Linux."
-#        sudo dnf install openssl -y
-#    elif grep -q -i "redhat" /etc/os-release; then
-#        echo "Detected Red Hat."
-#        sudo dnf install openssl -y
-#     elif grep -q -i "ubuntu" /etc/os-release; then
-#        echo "Detected Ubuntu."
-#        sudo apt-get install openssl -y
-#    else
-#        echo "Unsupported operating system."
-#    fi
-
 # Text Colors
 RED='\e[31m'
 GREEN='\e[32m'
@@ -33,6 +8,36 @@ YELLOW='\e[33m'
 BLUE='\e[34m'
 CYAN='\e[36m'
 RESET='\e[0m' # No Color
+# 1. Check if OpenSSL is installed.
+if command -v openssl &>/dev/null; then
+    echo  -e "✅ ${GREEN}OpenSSL is already installed.${RESET}"
+    openssl version
+
+else
+    echo -e "❌ ${RED}OpenSSL is not installed.${RESET}"
+fi
+
+# 2. If not installed, ask the user for permission.
+echo "OpenSSL is not found on this system."
+read -p "Do you want to install it now? (y/N): " response
+
+# 3. Proceed only if the user confirms (accepts 'y' or 'Y').
+if [[  "${response,,}" =~ ^y ]]; then
+    echo -e "${YELLOW}Installing openssl........${RESET}"
+    if grep -q -i "centos" /etc/os-release; then
+        echo -e "${BLUE}Detected RPM (Redhat, Centos, Rocky), System Must 8 and later${RESET}"
+        dnf install openssl -y
+    elif grep -q -i "ubuntu" /etc/os-release; then
+       echo -e "${BLUE}Detected Ubuntu.${RESET}"
+       apt-get install openssl -y
+   else
+       echo -e "${RED}Unsupported operating system.${RESET}"
+   fi
+else
+        echo -e "${RED}Operation cancelled.${RESET}"
+fi
+
+
 
 #Phase 2 
 echo -e "${YELLOW}Please Enter the Following Values or Press Enter Keeping Existing Data .${RESET}"
