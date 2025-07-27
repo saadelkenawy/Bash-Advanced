@@ -1,3 +1,31 @@
+#! /bin/bash
+#Task1: make sure openssl is installed
+#===============================================
+# if ! command -v openssl &> /dev/null; then
+#     echo "OpenSSL is not installed. Please install it to proceed."
+# fi 
+# # ask user to download openssl
+# echo "kindly confirm with yes to download openssl"
+# read -p "Do you want to download OpenSSL? (yes/no): " response
+# if [[ "$response" == "yes" ]]; then
+#     echo "Downloading OpenSSL..."
+#     # check if the system is Centos or Rocky Linux or Redhat by grep the /etc/os-release file and show name
+#    if grep -q -i "centos" /etc/os-release; then
+#        echo "Detected CentOS."
+#         sudo yum install openssl -y
+#    elif grep -q -i "rocky" /etc/os-release; then
+#        echo "Detected Rocky Linux."
+#        sudo dnf install openssl -y
+#    elif grep -q -i "redhat" /etc/os-release; then
+#        echo "Detected Red Hat."
+#        sudo dnf install openssl -y
+#     elif grep -q -i "ubuntu" /etc/os-release; then
+#        echo "Detected Ubuntu."
+#        sudo apt-get install openssl -y
+#    else
+#        echo "Unsupported operating system."
+#    fi
+
 # Text Colors
 RED='\e[31m'
 GREEN='\e[32m'
@@ -6,8 +34,8 @@ BLUE='\e[34m'
 CYAN='\e[36m'
 RESET='\e[0m' # No Color
 
-
 #Phase 2 
+echo -e "${YELLOW}Please Enter the Following Values or Press Enter Keeping Existing Data .${RESET}"
 read -p "$(echo -e ${BLUE} 'Country Name (2 letter code) [EG]: ' ${GREEN})" countryName
 countryName=${countryName:-EG}
 echo ""
@@ -62,13 +90,13 @@ echo -e "${GREEN}Server private key generated successfully.${RESET}"
 echo ""
 echo ""
 # Generate a CSR for your server
-openssl req -new -sha256 "/CN=S.M.S.K"  -key ${output_dir}/cert-key.pem -out ${output_dir}/cert.csr
+openssl req -new -sha256  -subj "/CN=S.M.S.K-CA"  -key ${output_dir}/cert-key.pem -out ${output_dir}/cert.csr
 echo -e "${GREEN}Certificate Signing Request (CSR) generated successfully.${RESET}"
 echo ""
 echo ""
-# Create v3.ext file for SANs (Subject Alternative Names)
-echo -e "${YELLOW}Creating v3.ext file for SANs...${RESET}"
-touch ${output_dir}/v3.ext
+# Create v3.cnf file for SANs (Subject Alternative Names)
+echo -e "${YELLOW}Creating v3.cnf file for SANs...${RESET}"
+touch ${output_dir}/v3.cnf
 san_list=""
 #How many DNS names you want to add?
 read -p "How many DNS names do you want to add? " dns_count
@@ -79,7 +107,7 @@ fi
 
 for ((i=1; i<=dns_count; i++)); do
     read -p "Enter DNS name $i: " dns_name
-    echo "DNS: $dns_name ," >> v3.ext
+    echo "DNS: $dns_name ," >> v3.cnf
     san_list+="DNS:$dns_name ,"
 
 done
@@ -92,17 +120,20 @@ fi
 
 for ((y=1; y<=ip_count; y++)); do
     read -p "Enter Ip-Address $y: " ip_address
-    echo "DNS: $ip_address ," >> v3.ext
+    echo "DNS: $ip_address ," >> v3.cnf
     san_list+="IP:$ip_address ,"
 done
 
 final_sans=${san_list%,}
-cat <<EOL > v3.ext
+cat <<EOL > ${output_dir}/v3.cnf
 keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement, keyCertSign
 subjectAltName = $final_sans
 EOL
-# Apply Clean On v3.ext file
-#sed -i '$s/[.,]$//' v3.ext
-echo -e "${GREEN}v3.ext file created successfully.${RESET}"
+# Apply Clean On v3.cnf file
+#sed -i '$s/[.,]$//' v3.cnf
+echo -e "${GREEN}v3.cnf file created successfully.${RESET}"
 echo ""
 echo "Alternative Names created successfully."
+# Generate the certificate signed by the CA
+openssl x509 -req -sha256 -days 3650 -in ${output_dir}/cert.csr -CA ${output_dir}/ca.pem -CAkey  ${output_dir}/ca-key.pem -out ${output_dir}/cert.pem -extfile ${output_dir}/v3.cnf -CAcreateserial -passin env:secure_passphrase
+echo -e "${GREEN}Certificate generated successfully.${RESET}"
