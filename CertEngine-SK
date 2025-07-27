@@ -142,3 +142,21 @@ echo "Alternative Names created successfully."
 # Generate the certificate signed by the CA
 openssl x509 -req -sha256 -days 3650 -in ${output_dir}/cert.csr -CA ${output_dir}/ca.pem -CAkey  ${output_dir}/ca-key.pem -out ${output_dir}/cert.pem -extfile ${output_dir}/v3.cnf -CAcreateserial -passin env:secure_passphrase
 echo -e "${GREEN}Certificate generated successfully.${RESET}"
+
+# in case system is rpm based, copy the CA certificate to the system's trusted CA directory
+if grep -q -i "centos" /etc/os-release || grep -q -i "rocky" /etc/os-release || grep -q -i "redhat" /etc/os-release; then
+    echo -e "${YELLOW}Detected RPM-based system. Copying CA certificate to trusted CA directory...${RESET}"
+    cp ${output_dir}/ca.pem /etc/pki/ca-trust/source/anchors/
+    update-ca-trust extract
+elif grep -q -i "ubuntu" /etc/os-release; then
+echo -e "${RESET}"
+    echo -e "${YELLOW}Detected Debian-based system. Copying CA certificate to trusted CA directory...${RESET}"
+    cp ${output_dir}/ca.pem /usr/local/share/ca-certificates/
+    update-ca-certificates
+else
+    echo -e "${RED}Unsupported operating system for automatic CA installation.${RESET}"
+fi
+#update CA on system
+echo -e "${YELLOW}Updating CA on the system...${RESET}"
+cp ${output_dir}/ca.pem /etc/pki/ca-trust/source/anchors/
+update-ca-trust extract
